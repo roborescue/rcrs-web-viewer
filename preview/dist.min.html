@@ -1,23 +1,23 @@
-{% load static %}
+<!-- RCRS Web Viewer v0.2.1602844712031 -->
 
 <!DOCTYPE html>
 <html>
     <head>
-        <title>RCRS Web Viewer</title>
         <meta charset="utf-8">
+        <title>RCRS Web Viewer</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <link href="{% static 'view/css/bootstrap.min.css' %}" rel="stylesheet">
-        <link href="{% static 'view/css/main.css' %}" rel="stylesheet">
+        <link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/main.css" rel="stylesheet">
 
         <script>module = {}</script>
 
-        <script src="{% static 'view/js/jquery.min.js' %}"></script>
-        <script src="{% static 'view/js/jq-ajax-progress.min.js' %}"></script>
-        <script src="{% static 'view/js/bootstrap.min.js' %}"></script>
-        <script src="{% static 'view/js/earcut.min.js' %}"></script>
-        <script src="{% static 'view/js/canvasdrawer.min.js' %}"></script>
-        <script src="{% static 'view/js/jszip.min.js' %}"></script>
+        <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+        <script src="../node_modules/jq-ajax-progress/src/jq-ajax-progress.min.js"></script>
+        <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="../node_modules/earcut/dist/earcut.min.js"></script>
+        <script src="../node_modules/canvas-drawer/dist/CanvasDrawer.min.js"></script>
+        <script src="../node_modules/jszip/dist/jszip.min.js"></script>
 
     </head>
     <body class="bg-light">
@@ -120,27 +120,27 @@
         </div>
 
         
-        <script src="{% static 'view/js/webviewer.min.js' %}"></script>
+        <script src="../dist/WebViewer.min.js"></script>
 
         <script>
-            const SCRIPT_EARCUT = '{% static 'view/js/earcut.min.js' %}';
-            const SCRIPT_CANVASDRAWER = '{% static 'view/js/canvasdrawer.min.js' %}';
+            const SCRIPT_EARCUT = '/node_modules/earcut/dist/earcut.min.js';
+            const SCRIPT_CANVASDRAWER = '/node_modules/canvas-drawer/dist/CanvasDrawer.min.js';
 
-            const JLOG_ZIP_FILE = "{% static match.log_file %}";
-            const JLOG_INNER_FILE = "{{match.inner_log_name}}";
+            const JLOG_ZIP_FILE = "data/test.zip";
+            const JLOG_INNER_FILE = "test.jlog";
 
-            const CANVAS_ID = 'canv';
             const PLAYING_DELAY = 800;
-            const WORKER_FILE = '{% static 'view/js/webviewer_worker.min.js' %}';
+            const WORKER_FILE = '../dist/WebViewerWorker.min.js';
+            const CANVAS_ID = 'canv';
             const ERROR_MODAL = '#errorModal';
             const LOADING_MODAL = '#loadingModal';
 
-            const ICONS_POLICE_OFFICE = "{% static 'view/image/po.png' %}";
-            const ICONS_AMBULANCE_CENTRE = "{% static 'view/image/ac.png' %}";
-            const ICONS_FIRE_STATION = "{% static 'view/image/fs.png' %}";
-            const ICONS_REFUGE = "{% static 'view/image/rf.png' %}";
-            const ICONS_GAS_STATION = "{% static 'view/image/gs.png' %}";
-            const ICONS_HYDRANT = "{% static 'view/image/hy.png' %}";
+            const ICONS_POLICE_OFFICE = "image/po.png";
+            const ICONS_AMBULANCE_CENTRE = "image/ac.png";
+            const ICONS_FIRE_STATION = "image/fs.png";
+            const ICONS_REFUGE = "image/rf.png";
+            const ICONS_GAS_STATION = "image/gs.png";
+            const ICONS_HYDRANT = "image/hy.png";
 
             $(() => {
                 main();

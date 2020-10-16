@@ -1,4 +1,4 @@
-<!-- RCRS Web Viewer v0.2.1602593430189 -->
+<!-- RCRS Web Viewer v0.2.1602844712031 -->
 
 <!DOCTYPE html>
 <html>
@@ -120,7 +120,10 @@
         </div>
 
         
-        <script src="../dist/WebViewer.js"></script>
+        <script src="../src/Constants.js"></script>
+        <script src="../src/GameMaker.js"></script>
+        <script src="../src/UIController.js"></script>
+        <script src="../src/Main.js"></script>
 
         <script>
             const SCRIPT_EARCUT = '/node_modules/earcut/dist/earcut.min.js';
@@ -130,7 +133,7 @@
             const JLOG_INNER_FILE = "test.jlog";
 
             const PLAYING_DELAY = 800;
-            const WORKER_FILE = '../dist/WebViewerWorker.js';
+            const WORKER_FILE = '../src/WorkerLoader.js';
             const CANVAS_ID = 'canv';
             const ERROR_MODAL = '#errorModal';
             const LOADING_MODAL = '#loadingModal';
