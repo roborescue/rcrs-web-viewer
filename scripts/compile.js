@@ -123,5 +123,4 @@ createTemplateFile("dist.min.html", minifiedSingleFiles, template, CONFIG.previe
 console.log(chalk.bold.green(totalLines + " Lines of code readed. Good job!"));
 
 // Update version of package.json
-let output = execSync('npm version ' + CURRENT_VERSION, { encoding: 'utf-8' })
-console.log(chalk.bold.green("Version: " + output.trim()));
+console.log(chalk.bold.green("Version: " + CURRENT_VERSION));
