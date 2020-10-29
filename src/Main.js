@@ -19,9 +19,11 @@ function showError(content){
     $(ERROR_MODAL).modal('show');
 }
 
-function showLoadingModal(){
+function showLoadingModal(shownCallback=()=>{}){
     if(!$(ERROR_MODAL).data()['bs.modal'] || !$(ERROR_MODAL).data()['bs.modal']._isShown){
-        $(LOADING_MODAL).modal('show');
+        $(LOADING_MODAL).modal('show').on('shown.bs.modal', function(){
+            shownCallback();
+        });
     }
 }
 
@@ -137,18 +139,28 @@ function parseShowJLOGFile(data){
     });
 }
 
-// Main
 function main(){
-    resizeCanvasToFit();
+    try {
+        resizeCanvasToFit();
 
-    // Check WebWorker Support
-    if(window.Worker){
-        showLoadingModal();
+        // Check WebWorker Support
+        if(window.Worker){
+            showLoadingModal(function(){
+                doMain();
+            });
+        }
+        else{
+            showError("WebWorker is not supported.");
+            return;
+        }
+        
+    } catch (error) {
+        showError(error.message);
     }
-    else{
-        showError("WebWorker is not supported.");
-        return;
-    }
+}
+
+// Main
+function doMain(){
 
     canvasDrawer = new CanvasDrawer({
         'id': CANVAS_ID,
@@ -203,15 +215,24 @@ function main(){
                 let percent = Math.round(80 * e.loaded / e.total);
                 loadFunction("Downloading cycles data ... (" + percent + "%)", percent);
             }
+        },
+        error: function (xhr, ajaxOptions, thrownError){
+            if(xhr.status==404) {
+                showError("Log file not found!");
+                return;
+            }
+
+            showError(thrownError);
         }
     }).done((msg) => {
-        console.log(msg);
         let z = new JSZip();
 
         z.loadAsync(msg).then(function(zip) {
             zip.file(JLOG_INNER_FILE).async("string").then(function(msg){
                 parseShowJLOGFile(msg);
             });
+        }).catch(function(error){
+            showError(error.message);
         });
     });
 }
