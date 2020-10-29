@@ -1,4 +1,4 @@
-<!-- RCRS Web Viewer v0.2.1602966352757 -->
+<!-- RCRS Web Viewer v0.2.1603930834743 -->
 
 <!DOCTYPE html>
 <html>
@@ -16,7 +16,7 @@
         <script src="../node_modules/jq-ajax-progress/src/jq-ajax-progress.min.js"></script>
         <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
         <script src="../node_modules/earcut/dist/earcut.min.js"></script>
-        <script src="../node_modules/canvas-drawer/dist/CanvasDrawer.min.js"></script>
+        <script src="../node_modules/@amiraslanaslani/canvas-drawer/dist/CanvasDrawer.min.js"></script>
         <script src="../node_modules/jszip/dist/jszip.min.js"></script>
 
     </head>
@@ -129,7 +129,7 @@
             var urlParams = new URLSearchParams(window.location.search);
 
             const SCRIPT_EARCUT = '/node_modules/earcut/dist/earcut.min.js';
-            const SCRIPT_CANVASDRAWER = '/node_modules/canvas-drawer/dist/CanvasDrawer.min.js';
+            const SCRIPT_CANVASDRAWER = '/node_modules/@amiraslanaslani/canvas-drawer/dist/CanvasDrawer.min.js';
 
             const JLOG_ZIP_FILE = urlParams.has('file') ? urlParams.get('file') : "";
             const JLOG_INNER_FILE = urlParams.has('infile') ? urlParams.get('infile') : "test.jlog";

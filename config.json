@@ -42,7 +42,7 @@
             "jq-ajax-progress/src/jq-ajax-progress.min.js",
             "bootstrap/dist/js/bootstrap.min.js",
             "earcut/dist/earcut.min.js",
-            "canvas-drawer/dist/CanvasDrawer.min.js",
+            "@amiraslanaslani/canvas-drawer/dist/CanvasDrawer.min.js",
             "jszip/dist/jszip.min.js"
         ],
         "path": "preview/",

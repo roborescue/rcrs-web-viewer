@@ -20,8 +20,8 @@
   },
   "homepage": "https://github.com/roborescue/rcrs-web-viewer#readme",
   "dependencies": {
+    "@amiraslanaslani/canvas-drawer": "^0.1.0",
     "bootstrap": "^4.5.2",
-    "canvas-drawer": "git+https://github.com/amiraslanaslani/Canvas-Drawer.git",
     "earcut": "^2.2.2",
     "jq-ajax-progress": "^1.0.0",
     "jquery": "^3.5.1",
