@@ -6,7 +6,7 @@ from shutil import copy2
 
 from django.core.management.base import BaseCommand, CommandError
 
-from christopher.models import Competition, Match
+from christopher.models import Competition, Match, Round
 from settings import LOG_DIR, RAW_LOG_FILE_FORMAT, PREPARED_LOG_DIR
 
 logging.basicConfig(level=logging.DEBUG)
@@ -36,15 +36,19 @@ def prepare_competition(competition):
     if not os.path.exists(competition_prepared_log_dir):
         os.mkdir(competition_prepared_log_dir)
     os.chdir(competition_log_dir)
-
+    
     for round_dir in os.listdir():
-        round_name = round_dir
-        for log_file_name in glob.glob(f"*.{RAW_LOG_FILE_FORMAT}", recursive=True):
+        try:
+            round_object = Round.objects.get(name=round_dir)
+        except Round.DoesNotExist:
+            round_object = Round.objects.create(name=round_dir)
+        print(f"prepare {competition.name}, {round_object.name}")
+        for log_file_name in glob.glob(f"**/*.{RAW_LOG_FILE_FORMAT}", recursive=True):
             try:
                 logging.info(log_file_name)
                 summary = read_log_summary(log_file_name)
                 score = read_last_score(log_file_name)
-                create_match(competition, round_name, summary, log_file_name, score)
+                create_match(competition, round_object, summary, log_file_name.split("/")[-1], score)
                 copy2(log_file_name, competition_prepared_log_dir)
             except CommandError as err:
                 logging.error(err)
@@ -54,7 +58,7 @@ def create_match(competition, round, summary, log_file_name, score=None):
     try:
         match = Match.objects.get(log_name=log_file_name)
         match.competition = competition
-        match.round=round,
+        match.round = round
         match.team_name = summary['TeamName']
         match.map_name = summary['MapName']
         match.score = score
@@ -64,7 +68,7 @@ def create_match(competition, round, summary, log_file_name, score=None):
     except Match.DoesNotExist:
         Match.objects.create(
             competition=competition, 
-            round=round, 
+            round=round,
             team_name=summary['TeamName'],
             map_name=summary['MapName'],
             score=score,
@@ -92,8 +96,8 @@ def read_last_score(file_name):
             log_file.close()
             last_line = lines[-1]
         last_line_dict = json.loads(last_line)
-        last_line_info = last_line_dict["Info"]
-        last_line_score = last_line_info["Score"]
+        last_line_info = last_line_dict.get("Info", {})
+        last_line_score = last_line_info.get("Score", -1)
         return float(last_line_score)
     except IOError:
         raise CommandError(f"Could not read last score: {file_name}")

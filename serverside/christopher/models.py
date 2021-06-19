@@ -12,7 +12,7 @@ class Competition(models.Model):
 
 
 class Round(models.Model):
-    name = models.CharField(null=False, max_length=64)
+    name = models.CharField(null=False, max_length=64, unique=True)
 
     @property
     def order(self):
