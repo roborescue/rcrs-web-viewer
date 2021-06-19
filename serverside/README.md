@@ -5,8 +5,8 @@ Christopher is a  rcrs-webviwer backend.
 ### Before Deploy:
 
 ```sh
-    python manage migrate
-    python manage collactstatic
+    python manage.py migrate
+    python manage.py collectstatic
 ```
 
 ### Add competition:

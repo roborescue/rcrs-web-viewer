@@ -37,21 +37,24 @@ def prepare_competition(competition):
         os.mkdir(competition_prepared_log_dir)
     os.chdir(competition_log_dir)
 
-    for log_file_name in glob.glob(f"*.{RAW_LOG_FILE_FORMAT}"):
-        try:
-            logging.info(log_file_name)
-            summary = read_log_summary(log_file_name)
-            score = read_last_score(log_file_name)
-            create_match(competition, summary, log_file_name, score)
-            copy2(log_file_name, competition_prepared_log_dir)
-        except CommandError as err:
-            logging.error(err)
+    for round_dir in os.listdir():
+        round_name = round_dir
+        for log_file_name in glob.glob(f"*.{RAW_LOG_FILE_FORMAT}", recursive=True):
+            try:
+                logging.info(log_file_name)
+                summary = read_log_summary(log_file_name)
+                score = read_last_score(log_file_name)
+                create_match(competition, round_name, summary, log_file_name, score)
+                copy2(log_file_name, competition_prepared_log_dir)
+            except CommandError as err:
+                logging.error(err)
 
 
-def create_match(competition, summary, log_file_name, score=None):
+def create_match(competition, round, summary, log_file_name, score=None):
     try:
         match = Match.objects.get(log_name=log_file_name)
         match.competition = competition
+        match.round=round,
         match.team_name = summary['TeamName']
         match.map_name = summary['MapName']
         match.score = score
@@ -61,9 +64,10 @@ def create_match(competition, summary, log_file_name, score=None):
     except Match.DoesNotExist:
         Match.objects.create(
             competition=competition, 
-            round=None, 
+            round=round, 
             team_name=summary['TeamName'],
             map_name=summary['MapName'],
+            score=score,
             log_name=log_file_name
         )
 

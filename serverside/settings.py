@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent
 SECRET_KEY = 'This is for development'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
