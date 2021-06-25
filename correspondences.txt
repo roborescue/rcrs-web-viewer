@@ -1,0 +1,30 @@
+# web viewer
+f:./dist/WebViewer.min.js:./view/js/webviewer.min.js
+f:./dist/WebViewerWorker.min.js:./view/js/webviewer_worker.min.js
+
+# files
+d:./preview/image:./view/image #salooooooom
+d:./preview/css:./view/css
+
+# bootstrap
+f:./node_modules/bootstrap/dist/css/bootstrap.min.css:./view/css/bootstrap.min.css
+f:./node_modules/bootstrap/dist/css/bootstrap.min.css.map:./view/css/bootstrap.min.css.map
+f:./node_modules/bootstrap/dist/js/bootstrap.min.js:./view/js/bootstrap.min.js
+f:./node_modules/bootstrap/dist/js/bootstrap.min.js.map:./view/js/bootstrap.min.js.map
+
+# canvas-drawer
+f:./node_modules/canvas-drawer/dist/CanvasDrawer.min.js:./view/js/canvasdrawer.min.js
+
+# earcut
+f:./node_modules/earcut/dist/earcut.min.js:./view/js/earcut.min.js
+
+# jq-ajax-progress
+f:./node_modules/jq-ajax-progress/src/jq-ajax-progress.min.js:./view/js/jq-ajax-progress.min.js
+
+# jquery
+f:./node_modules/jquery/dist/jquery.min.js:./view/js/jquery.min.js
+
+# jszip
+f:./node_modules/jszip/dist/jszip.min.js:./view/js/jszip.min.js
+
+#! End newline (\n) is important

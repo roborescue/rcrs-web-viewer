@@ -1,0 +1,64 @@
+{
+    "compile":[
+        {
+            "files": [
+                "src/Constants.js",
+                "src/GameMaker.js",
+                "src/UIController.js",
+                "src/Main.js"
+            ],
+            "dist": {
+                "main": "WebViewer.js",
+                "minified": "WebViewer.min.js"
+            },
+            "inPreview": true
+        },
+        {
+            "files": [
+                "src/Constants.js",
+                "src/Entity.js",
+                "src/EntityColor.js",
+                "src/EntityHandler.js",
+                "src/WorkerDataLoader.js",
+                "src/WorkerMain.js"
+            ],
+            "dist": {
+                "main": "WebViewerWorker.js",
+                "minified": "WebViewerWorker.min.js"
+            },
+            "inPreview": false
+        }
+    ],
+    "doc":{
+        "jsdoc": "docs/jsdoc/",
+        "template": "scripts/compile/markdown.mustache"
+    },
+    "preview":{
+        "template": "scripts/compile/preview.mustache",
+        "comment": "scripts/compile/comment.mustache",
+        "title": "RCRS Web Viewer",
+        "modules": [
+            "jquery/dist/jquery.min.js",
+            "jq-ajax-progress/src/jq-ajax-progress.min.js",
+            "bootstrap/dist/js/bootstrap.min.js",
+            "earcut/dist/earcut.min.js",
+            "@amiraslanaslani/canvas-drawer/dist/CanvasDrawer.min.js",
+            "jszip/dist/jszip.min.js"
+        ],
+        "path": "preview/",
+        "param":{
+            "devel" : {
+                "workerFile": "../src/WorkerLoader.js"
+            },
+            "dist" : {
+                "workerFile": "../dist/WebViewerWorker.js"
+            },
+            "dist.min" : {
+                "workerFile": "../dist/WebViewerWorker.min.js"
+            }
+        }
+    },
+    "dist_path": "dist/",
+    "version": "0.2",
+    "homepage": "https://github.com/roborescue/rcrs-web-viewer"
+}
