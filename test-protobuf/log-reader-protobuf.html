@@ -1,0 +1,88 @@
+<html>
+<head>
+<script src="rcrs-js/RCRSLogProto_pb.out.js"></script>
+
+
+<script src="js/lzma-min.js"></script>
+
+
+</head>
+<body>
+<button id=go>Load</button>
+<div id=area></div>
+
+<script>
+var lzma = new LZMA("js/lzma2_worker-min.js");
+function read_int32(byte_array){
+    value = ((byte_array[0]) << 24) + ((byte_array[1])<< 16) + ((byte_array[2]) << 8) + (byte_array[3])
+    return value
+}
+const binArrayToString = array => array.map(byte => String.fromCharCode(parseInt(byte))).join('')
+
+function decompress(data) {
+    console.log("decompressing ",data);
+	lzma.decompress(data, function on_decompress_complete(result) {
+			result=new Uint8Array(result)
+			var i=0;
+			while(result.length>0){
+				size=read_int32(result)
+				content=result.slice(4,4+size)
+				//console.log("size="+size+":"+content)
+				log=proto.LogProto.deserializeBinary(content);
+				i++;
+				
+				//console.log(log);
+				switch (log.getLogCase()){
+				case proto.LogProto.LogCase.START:
+					console.log("Start Record is Find",log.getStart());
+					break;
+				case proto.LogProto.LogCase.COMMAND:
+					console.log("Command Record is Find",log.getCommand());
+					break;
+				case proto.LogProto.LogCase.CONFIG:
+					console.log("Config Record is Find",log.getConfig());
+					break;
+				case proto.LogProto.LogCase.INITIALCONDITION:
+					console.log("Initialcondition Record is Find",log.getInitialcondition());
+					break;
+				case proto.LogProto.LogCase.UPDATE:
+					console.log("Update Record is Find",log.getUpdate());
+					break;
+				case proto.LogProto.LogCase.PERCEPTION:
+					console.log("Update Record is Find",log.getPerception());
+					break;
+				case proto.LogProto.LogCase.END:
+					console.log("End Record is Find",log.getEnd());
+					break;
+				}
+				
+				result=result.slice(4+size)
+			}
+            document.getElementById("area").innerHTML=i+" records parsed";
+
+		
+		
+    }, function on_decompress_progress_update(percent) {
+        document.title = "Decompressing: " + (percent * 100) + "%";
+    });
+}
+
+document.getElementById("go").onclick = function () {
+    var ajax = new XMLHttpRequest();
+    ajax.open("GET", "./rescue.log.lzma", true);
+    ajax.responseType = "arraybuffer";
+    ajax.onload = function () {
+        /// LZMA-JS can read Uint8Array directly.
+        decompress(new Uint8Array(ajax.response));
+    };
+    
+    /// Clear the area for good measure.
+    document.getElementById("area").innerHTML = "";
+    
+    ajax.send();
+}
+</script>
+
+
+</body>
+</html>

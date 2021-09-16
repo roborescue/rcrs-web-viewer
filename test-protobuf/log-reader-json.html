@@ -1,0 +1,52 @@
+<html>
+<head>
+<script src="rcrs-js/RCRSLogProto_pb.out.js"></script>
+
+
+<script src="js/lzma-min.js"></script>
+
+
+</head>
+<body>
+<button id=go>Load</button>
+<div id=area></div>
+
+<script>
+var lzma = new LZMA("js/lzma2_worker-min.js");
+const binArrayToString = array => array.map(byte => String.fromCharCode(parseInt(byte))).join('')
+
+function decompress(data) {
+    console.log("decompressing ",data);
+	lzma.decompress(data, function on_decompress_complete(result) {
+			json=JSON.parse(result);
+			document.getElementById("area").innerHTML=json.length+" records parsed";
+			for(var i=0;i<json.lenght;i++)
+				console.log(json[i]);
+				document.getElementById("area").innerHTML += json[i];
+
+		
+		
+    }, function on_decompress_progress_update(percent) {
+        document.title = "Decompressing: " + (percent * 100) + "%";
+    });
+}
+
+document.getElementById("go").onclick = function () {
+    var ajax = new XMLHttpRequest();
+    ajax.open("GET", "./rescue.json.lzma", true);
+    ajax.responseType = "arraybuffer";
+    ajax.onload = function () {
+        /// LZMA-JS can read Uint8Array directly.
+        decompress(new Uint8Array(ajax.response));
+    };
+    
+    /// Clear the area for good measure.
+    document.getElementById("area").innerHTML = "";
+    
+    ajax.send();
+}
+</script>
+
+
+</body>
+</html>

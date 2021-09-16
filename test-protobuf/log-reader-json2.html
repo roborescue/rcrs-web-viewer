@@ -1,0 +1,71 @@
+<html>
+<head>
+<script src="rcrs-js/RCRSLogProto_pb.out.js"></script>
+
+
+<script src="js/lzma-min.js"></script>
+
+
+</head>
+<body>
+<button id=go>Load</button>
+<div id=area></div>
+
+<script>
+var lzma = new LZMA("js/lzma2_worker-min.js");
+const binArrayToString = array => array.map(byte => String.fromCharCode(parseInt(byte))).join('')
+
+function decompress(data) {
+    console.log("decompressing ",data);
+	lzma.decompress(data, function on_decompress_complete(result) {
+			records=JSON.parse(result).records;
+			document.getElementById("area").innerHTML=records.length+" records parsed";
+			for(var i=0;i<records.length;i++){
+				log=records[i]
+				console.log(log);
+				if(log.start!==undefined)
+					console.log("Start Record is Find",log.start);
+				else if(log.command!==undefined)
+					console.log("Command Record is Find",log.command);
+				else if(log.config!==undefined)
+					console.log("Config Record is Find",log.config);
+				else if(log.initialCondition!==undefined)
+					console.log("Initialcondition Record is Find",log.initialCondition);
+				else if(log.update!==undefined)
+					console.log("Update Record is Find",log.update);
+				else if(log.perception!==undefined)
+					console.log("perception Record is Find",log.perception);
+				else if(log.end!==undefined)
+					console.log("End Record is Find",log.end);
+				
+				
+			}
+		
+		
+
+		
+		
+    }, function on_decompress_progress_update(percent) {
+        document.title = "Decompressing: " + (percent * 100) + "%";
+    });
+}
+
+document.getElementById("go").onclick = function () {
+    var ajax = new XMLHttpRequest();
+    ajax.open("GET", "./rescue2.json.lzma", true);
+    ajax.responseType = "arraybuffer";
+    ajax.onload = function () {
+        /// LZMA-JS can read Uint8Array directly.
+        decompress(new Uint8Array(ajax.response));
+    };
+    
+    /// Clear the area for good measure.
+    document.getElementById("area").innerHTML = "";
+    
+    ajax.send();
+}
+</script>
+
+
+</body>
+</html>
