@@ -2,7 +2,8 @@
 
 <head>
 	<script src="js/lzma-min.js"></script>
-	<script src="rcrs-js/RCRSLogProto_pb.out.js"></script>
+	<script src="rcrs-js/RCRSLogProto_pb.js"></script>
+	<script src="rcrs-js/URN.js"></script>
 	<script src="rcrs-js/RCRSLogReader.js"></script>
 
 
@@ -19,7 +20,7 @@
 	<script>
 		function load() {
 			var ajax = new XMLHttpRequest();
-			ajax.open("GET", "./rescue.log.lzma", true);
+			ajax.open("GET", "./rescue.log.xz", true);
 			ajax.responseType = "arraybuffer";
 			ajax.onload = function () {
 				/// LZMA-JS can read Uint8Array directly.
@@ -62,19 +63,46 @@
 
 		}
 		function showCycle(cycle) {
-			document.getElementById("entity").innerHTML = Object.values(simulation.worldmodels[cycle].entities);
-			document.getElementById("command").innerHTML = simulation.worldmodels[cycle].commands;
-			document.getElementById("perception").innerHTML = Object.values(simulation.worldmodels[cycle].perceptions);
-			document.getElementById("changeset").innerHTML = Object.values(simulation.worldmodels[cycle].changesets);
+			allEntities=Object.values(simulation.worldmodels[cycle].entities);
+			document.getElementById("entity").innerHTML = "";
+			document.getElementById("property").innerHTML="";
+			document.getElementById("command").innerHTML="";
+			document.getElementById("perception").innerHTML="";
+			document.getElementById("changeset").innerHTML=simulation.worldmodels[cycle].changeset;
+			allEntities.forEach(e=>{
+				document.getElementById("entity").innerHTML+=e+"\n";
+				properties=Object.values(e.properties)
+				document.getElementById("property").innerHTML += e+": "+ properties+"\n";
+			});
+			simulation.worldmodels[cycle].commands.forEach(c=>{
+			document.getElementById("command").innerHTML +=c+"\n"}) ;
 
+			Object.values(simulation.worldmodels[cycle].perceptions).forEach(p=>{
+			document.getElementById("perception").innerHTML +=p+"\n" ;
+			});
 
+			civilians=simulation.worldmodels[cycle].entitiesByUrn[URN.Entity.CIVILIAN];
+			
+			civilian=civilians[0];
+			civilian_hp=civilian.properties[URN.Property.HP].value
+			document.getElementById("civilian_property").innerHTML=civilians+"\n";
+			document.getElementById("civilian_property").innerHTML+=civilian+" HP=" +civilian_hp;
 		}
 	</script>
 
 
-
+	<h1>Get Specific Property:</h1>
+	You need to just select your entity and then: entity.propoerties[URN.Property.HP]
+	for instance=
+	<pre>
+		civilians=simulation.worldmodels[cycle].entitiesByUrn[URN.Entity.CIVILIAN]
+		hp=civilians[0].properties[URN.Property.HP]
+	</pre>
+	<pre class="pre-scrollable" id="civilian_property"></pre>
 	<h1>Entities</h1>
 	<pre class="pre-scrollable" id="entity"></pre>
+	<h1>Properties of first Entity</h1>
+	<pre class="pre-scrollable" id="property"></pre>
 	<h1>Changeset</h1>
 	<pre class="pre-scrollable" id="changeset"></pre>
 	<h1>Commands</h1>

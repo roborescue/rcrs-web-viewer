@@ -3,11 +3,11 @@ function read_int32(byte_array) {
 	value = ((byte_array[0]) << 24) + ((byte_array[1]) << 16) + ((byte_array[2]) << 8) + (byte_array[3])
 	return value
 }
-function readRCRSLog(data,onready,progress_update) {
+function readRCRSLog(data, onready, progress_update) {
 	console.log("decompressing ", data);
 	lzma.decompress(data, function on_decompress_complete(result) {
 		result = new Uint8Array(result)
-		let simulation=new Simulation();
+		let simulation = new Simulation();
 		var i = 0;
 		while (result.length > 0) {
 			size = read_int32(result)
@@ -56,8 +56,8 @@ class Simulation {
 	worldmodels = {}
 	constructor() {
 	}
-	getTotalTimeSteps(){
-		return Object.keys(simulation.worldmodels).length-1;
+	getTotalTimeSteps() {
+		return Object.keys(simulation.worldmodels).length - 1;
 	}
 	getWorld(time) {
 		if (!this.worldmodels[time]) {
@@ -104,7 +104,7 @@ class Simulation {
 
 class WorldModel {
 	commands = []
-	changesets = {}
+	changeset = null;
 	perceptions = {}
 	entities = {};
 	entitiesByUrn = {};
@@ -114,9 +114,6 @@ class WorldModel {
 	}
 	cloneForNextCycle() {
 		let newWorld = new WorldModel(this.time + 1);
-		newWorld.commands = [];
-		newWorld.perceptions = [];
-		newWorld.changesets = [];
 		Object.keys(this.entities).forEach(eid => {
 			newWorld.entities[eid] = this.entities[eid].clone();
 		});
@@ -124,6 +121,7 @@ class WorldModel {
 		return newWorld;
 	}
 	update(changeset) {
+		this.changeset=changeset;
 		let changes = changeset.getChangesList()
 		changes.forEach(c => {
 			let entity = this.entities[c.getEntityid()];
@@ -140,7 +138,7 @@ class WorldModel {
 	refresh() {
 		this.entitiesByUrn = {}
 		Object.keys(this.entities).forEach(eid => {
-			let e=this.entities[eid];
+			let e = this.entities[eid];
 			if (!this.entitiesByUrn[e.urn])
 				this.entitiesByUrn[e.urn] = []
 			this.entitiesByUrn[e.urn].push(e)
@@ -168,7 +166,7 @@ class WorldModel {
 		this.perceptions[entityId] = perception;
 	}
 
-	
+
 }
 
 
@@ -176,9 +174,9 @@ class WorldModel {
 class Entity {
 
 	properties = {}
-	
+
 	constructor(entityProto) {
-		if (!entityProto)return;
+		if (!entityProto) return;
 		this.id = entityProto.getEntityid();
 		this.urn = entityProto.getUrn();
 		let props = entityProto.getPropertiesList();
@@ -199,8 +197,8 @@ class Entity {
 		});
 		return newE;
 	}
-	toString(){
-		return `${this.urn}(${this.id})`
+	toString() {
+		return `${URN.MAP[this.urn]}(${this.id})`
 	}
 }
 
@@ -252,10 +250,43 @@ class Property {
 		// not needed to clone with new Entity for saving memory
 		return this;
 	}
-	toString(){
-		return this.urn+": "+(this.isDefined?this.value:"undefined");
+	toString() {
+		return URN.MAP[this.urn] + ": " + (this.isDefined ? this.value : "undefined");
 	}
 }
 
 
 
+
+
+proto.MessageProto.prototype.toString = function () {
+	let components = this.getComponentsMap().map_;
+	let res = `${URN.MAP[this.getUrn()]}: `;
+	Object.keys(components).forEach(c => {
+		res += URN.MAP[c] + "=" + components[c].value.toString() + " "
+	});
+	return res;
+};
+
+
+
+proto.PerceptionLogProto.prototype.toString = function () {
+	let entityId = this.getEntityid()
+	let communications=this.getCommunicationsList()
+	let time = this.getTime()
+	let changeset = this.getVisible()
+	return `time=${time} entityId=${entityId} changeset=${changeset.toString()} communications=${communications.toString()} `; 
+};
+
+
+proto.ChangeSetProto.prototype.toString = function () {
+	deletedIds=this.getDeletesList()
+	let res=`deleted=${deletedIds} updated=`;
+    changes=this.getChangesList()
+    changes.forEach(c=>{
+		res+=c.getEntityid()+",";
+        // c.getUrn()
+        // c.getPropertiesList()
+	});
+	return res;
+};

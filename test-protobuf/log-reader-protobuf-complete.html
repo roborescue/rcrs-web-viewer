@@ -1,0 +1,196 @@
+<html>
+
+<head>
+	<script src="rcrs-js/RCRSLogProto_pb.out.js"></script>
+
+
+	<script src="js/lzma-min.js"></script>
+
+
+</head>
+
+<body>
+	<button id=go>Load</button>
+	<div id=area></div>
+
+	<script>
+		var lzma = new LZMA("js/lzma2_worker-min.js");
+		function read_int32(byte_array) {
+			value = ((byte_array[0]) << 24) + ((byte_array[1]) << 16) + ((byte_array[2]) << 8) + (byte_array[3])
+			return value
+		}
+		const binArrayToString = array => array.map(byte => String.fromCharCode(parseInt(byte))).join('')
+
+		function decompress(data) {
+			console.log("decompressing ", data);
+			lzma.decompress(data, function on_decompress_complete(result) {
+				result = new Uint8Array(result)
+				var i = 0;
+				while (result.length > 0) {
+					size = read_int32(result)
+					content = result.slice(4, 4 + size)
+					//console.log("size="+size+":"+content)
+					log = proto.LogProto.deserializeBinary(content);
+					i++;
+
+					//console.log(log);
+					switch (log.getLogCase()) {
+						case proto.LogProto.LogCase.START:
+							console.log("Start Record is Find", log.getStart());
+							break;
+						case proto.LogProto.LogCase.COMMAND:
+							processCommand(log.getCommand());
+							console.log("Command Record is Find", log.getCommand());
+							break;
+						case proto.LogProto.LogCase.CONFIG:
+							processConfig(log.getConfig());
+							console.log("Config Record is Find", log.getConfig());
+							break;
+						case proto.LogProto.LogCase.INITIALCONDITION:
+							processInitCondition(log.getInitialcondition());
+							console.log("Initialcondition Record is Find", log.getInitialcondition());
+							break;
+						case proto.LogProto.LogCase.UPDATE:
+							processUpdate(log.getUpdate());
+							console.log("Update Record is Find", log.getUpdate());
+							break;
+						case proto.LogProto.LogCase.PERCEPTION:
+							processPerception(log.getPerception());
+							console.log("Perception Record is Find", log.getPerception());
+							break;
+						case proto.LogProto.LogCase.END:
+							console.log("End Record is Find", log.getEnd());
+							break;
+					}
+
+					result = result.slice(4 + size)
+				}
+				document.getElementById("area").innerHTML = i + " records parsed";
+
+
+
+			}, function on_decompress_progress_update(percent) {
+				document.title = "Decompressing: " + (percent * 100) + "%";
+			});
+		}
+		function processCommand(command) {
+			let time = command.getTime();
+			command.getCommandsList().forEach(c => {
+				urn = c.getUrn();
+				components = c.getComponentsMap().map_;
+				componentKeys = Object.keys(components);
+			});
+		}
+		function processConfig(configlog) {
+			let config = configlog.getConfig().getDataMap().map_;
+			let keys = Object.keys(config);
+			// get a specific value: 
+			timesteps = config['kernel.timesteps'].value
+		}
+
+		function processInitCondition(init) {
+			let entities = log.getInitialcondition().getEntitiesList()
+			entities.forEach(e => processEntity(e));
+		}
+		function processEntity(e) {
+			let entityId = e.getEntityid();
+			let urn = e.getUrn();
+			let properties = e.getPropertiesList();
+			properties.forEach(p => processProperty(p));
+		}
+		function processProperty(p) {
+			let urn = p.getUrn();
+			let isDefined = p.getDefined();
+			let value = null;
+			switch (p.getValueCase()) {
+				case proto.PropertyProto.ValueCase.BOOLVALUE:
+					value = p.getBoolvalue();
+					break;
+				case proto.PropertyProto.ValueCase.BYTELIST:
+					value = p.getBytelist();
+					break;
+				case proto.PropertyProto.ValueCase.DOUBLEVALUE:
+					value = p.getDoublevalue();
+					break;
+				case proto.PropertyProto.ValueCase.EDGELIST:
+					value = p.getEdgelist().getEdgesList();
+					// Example Usage
+					//edges.forEach(e=>{
+					// 	  let startX=e.getStartx();
+					//       let startY=e.getStarty();
+					//       let endX=e.getEndx();
+					//       let endY=e.getEndy();
+					//       let neighbour=e.getNeighbour();
+					//});
+					break;
+				case proto.PropertyProto.ValueCase.INTLIST:
+					value = p.getIntlist();
+					break;
+				case proto.PropertyProto.ValueCase.INTMATRIX:
+					value = p.getIntmatrix();
+					break;
+				case proto.PropertyProto.ValueCase.INTVALUE:
+					value = p.getIntvalue();
+					break;
+				case proto.PropertyProto.ValueCase.POINT2D:
+					value = p.getPoint2d();
+					// Example Usage
+					//let x=  value.getX();
+					//let y=  value.getY();
+					break;
+			}
+			return urn, value;
+		}
+		function processPerception(perception) {
+			let entityId = perception.getEntityid()
+			let Communications = perception.getCommunicationsList()
+			let time = perception.getTime()
+			let changeset = perception.getVisible()
+		}
+		function processUpdate(update) {
+			update = log.getUpdate()
+			time = update.getTime()
+			changeset = update.getChanges()
+		}
+		function processChangeSet(changeset) {
+			deletedIds = changeset.getDeletesList()
+			changes = changeset.getChangesList()
+			// for c in changes:
+			c.getEntityid()
+			c.getUrn()
+			c.getPropertiesList()
+		}
+
+
+		document.getElementById("go").onclick = function () {
+			var ajax = new XMLHttpRequest();
+			ajax.open("GET", "./rescue.log.lzma", true);
+			ajax.responseType = "arraybuffer";
+			ajax.onload = function () {
+				/// LZMA-JS can read Uint8Array directly.
+				decompress(new Uint8Array(ajax.response));
+			};
+
+			/// Clear the area for good measure.
+			document.getElementById("area").innerHTML = "";
+
+			ajax.send();
+		}
+	</script>
+
+
+	<h1>Entities</h1>
+	<pre class="pre-scrollable" id="entity"></pre>
+	<h1>Config</h1>
+	<pre class="pre-scrollable" id="config"></pre>
+
+	<style>
+		.pre-scrollable {
+			max-height: 340px;
+			overflow-y: scroll;
+		}
+	</style>
+
+</body>
+
+</html>
