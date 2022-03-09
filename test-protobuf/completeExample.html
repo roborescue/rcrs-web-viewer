@@ -1,0 +1,97 @@
+<html>
+
+<head>
+	<script src="js/lzma-min.js"></script>
+	<script src="rcrs-js/RCRSLogProto_pb.out.js"></script>
+	<script src="rcrs-js/RCRSLogReader.js"></script>
+
+
+
+</head>
+
+<body>
+	<button onclick="load()">Load</button>
+	<div id=area></div>
+	<div id="toolbar" style="display:none">
+	<button onclick="gotocycle(-1)">&#60;</button> <input id="cycle" type="number" value="0"><button
+		onclick="gotocycle()">go to Cycle</button> <button onclick="gotocycle(+1)">&#62; </button>
+	</div>
+	<script>
+		function load() {
+			var ajax = new XMLHttpRequest();
+			ajax.open("GET", "./rescue.log.lzma", true);
+			ajax.responseType = "arraybuffer";
+			ajax.onload = function () {
+				/// LZMA-JS can read Uint8Array directly.
+				readRCRSLog(new Uint8Array(ajax.response),
+					sim => {
+						simulation = sim;
+						document.title = `total cycles=${sim.getTotalTimeSteps()}`
+						document.getElementById("area").innerHTML = document.title;
+						Object.keys(simulation.config).forEach(c => {
+							document.getElementById("config").innerHTML += "\n" + c + ": " + simulation.config[c].value;
+						});
+						showCycle(0);
+						document.getElementById("toolbar").style.display="block";
+					}, percent => {
+						document.title = "Loading cycle " + percent + "";
+						document.getElementById("area").innerHTML = document.title;
+					});
+			};
+
+			/// Clear the area for good measure.
+			document.getElementById("area").innerHTML = "";
+
+			ajax.send();
+		}
+		function gotocycle(val) {
+			if (typeof simulation === 'undefined') {
+				alert("you need to load logs before");
+				return;
+			}
+			cycle = parseInt(document.getElementById("cycle").value);
+			if (val) {
+				cycle += val;
+				cycle = Math.min(simulation.getTotalTimeSteps(), cycle)
+				cycle = Math.max(0, cycle)
+				document.getElementById("cycle").value = cycle;
+			}
+
+
+			showCycle(cycle)
+
+		}
+		function showCycle(cycle) {
+			document.getElementById("entity").innerHTML = Object.values(simulation.worldmodels[cycle].entities);
+			document.getElementById("command").innerHTML = simulation.worldmodels[cycle].commands;
+			document.getElementById("perception").innerHTML = Object.values(simulation.worldmodels[cycle].perceptions);
+			document.getElementById("changeset").innerHTML = Object.values(simulation.worldmodels[cycle].changesets);
+
+
+		}
+	</script>
+
+
+
+	<h1>Entities</h1>
+	<pre class="pre-scrollable" id="entity"></pre>
+	<h1>Changeset</h1>
+	<pre class="pre-scrollable" id="changeset"></pre>
+	<h1>Commands</h1>
+	<pre class="pre-scrollable" id="command"></pre>
+	<h1>Perceptions</h1>
+	<pre class="pre-scrollable" id="perception"></pre>
+
+	<h1>Config</h1>
+	<pre class="pre-scrollable" id="config"></pre>
+
+	<style>
+		.pre-scrollable {
+			max-height: 340px;
+			overflow-y: scroll;
+		}
+	</style>
+
+</body>
+
+</html>
